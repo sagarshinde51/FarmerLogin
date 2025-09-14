@@ -1,48 +1,43 @@
 import streamlit as st
-import mysql.connector
+import smtplib
+from email.mime.text import MIMEText
 
-# Database connection function
-def get_connection():
-    return mysql.connector.connect(
-        host="82.180.143.66",
-        user="u263681140_AttendanceInt",
-        password="SagarAtten@12345",
-        database="u263681140_Attendance"
-    )
+st.title("📧 Smart Dairy - Recover Password Mailer")
 
-# Streamlit App
-st.set_page_config(page_title="Farmer Login", page_icon="🌾", layout="centered")
+# Brevo SMTP details
+SMTP_SERVER = "smtp-relay.brevo.com"
+SMTP_PORT = 587
 
-st.title("🌾 Farmer Login")
+# Credentials (from Brevo SMTP settings)
+login_email = "96fca9001@smtp-brevo.com"   # This is the SMTP Login from Brevo
+password = "CHLfKzFp1xSUQym5..."           # This is the SMTP Key (Master Password)
 
-userid = st.text_input("Enter RFID No or Mobile No")
-password = st.text_input("Enter Password", type="password")
 
-if st.button("Login"):
+# Fixed sender/receiver and subject
+from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
+to_email = "sagar9665278681@gmail.com"
+subject = "Smart Dairy Recover Password"
+
+# Recovery message
+message = st.text_area("Enter Recovery Message", 
+                       "Hello, here is your Smart Dairy password reset link or temporary password.")
+
+if st.button("Send Recovery Mail"):
     try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
+        # Create plain text email
+        msg = MIMEText(message, "plain")
+        msg["From"] = from_email
+        msg["To"] = to_email
+        msg["Subject"] = subject
 
-        query = """SELECT * FROM Farmers_data 
-                   WHERE (RFID_No = %s OR mobile_no = %s) AND password = %s"""
-        cursor.execute(query, (userid, userid, password))
-        result = cursor.fetchone()
+        # Connect and send via Brevo SMTP
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(login_email, password)
+        server.sendmail(from_email, to_email, msg.as_string())
+        server.quit()
 
-        if result:
-            st.success(f"✅ Login Successful! Welcome, {result['farmer_name']}")
-            
-            # Display farmer details
-            st.subheader("Farmer Details:")
-            st.write(f"👤 Name: {result['farmer_name']}")
-            st.write(f"📞 Mobile: {result['mobile_no']}")
-            st.write(f"🏠 Address: {result['address']}")
-            st.write(f"🏦 Bank: {result['bank']}")
-            st.write(f"💳 Account No: {result['account_no']}")
-            st.write(f"🐄 Cattle Type: {result['cattle_type']}")
-        else:
-            st.error("❌ Invalid RFID/Mobile No or Password")
+        st.success(f"✅ Recovery mail sent to {to_email} from {from_email}")
 
-        cursor.close()
-        conn.close()
     except Exception as e:
-        st.error(f"Database connection error: {e}")
+        st.error(f"❌ Failed to send email: {e}")
