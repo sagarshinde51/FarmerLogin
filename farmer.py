@@ -2,27 +2,34 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 
-st.title("📧 Smart Dairy - Recover Password Mailer")
+# ----------------- APP UI -----------------
+st.set_page_config(page_title="Smart Dairy - Password Recovery", page_icon="🐄")
 
-# Brevo SMTP details
+st.title("🐄 Smart Dairy - Recover Password Mailer")
+
+st.info("Use your Brevo SMTP login and key to send recovery emails.")
+
+# ----------------- BREVO CONFIG -----------------
 SMTP_SERVER = "smtp-relay.brevo.com"
 SMTP_PORT = 587
 
-# Credentials (from Brevo SMTP settings)
-login_email = "96fca9001@smtp-brevo.com"   # This is the SMTP Login from Brevo
-password = "CHLfKzFp1xSUQym5..."           # This is the SMTP Key (Master Password)
+# Credentials (from Brevo dashboard)
+login_email = st.text_input("Brevo SMTP Login (e.g., 96fca9001@smtp-brevo.com)")
+password = st.text_input("SMTP Key (Master Password)", type="password")
 
-
-# Fixed sender/receiver and subject
+# Fixed sender & receiver
 from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
 to_email = "sagar9665278681@gmail.com"
 subject = "Smart Dairy Recover Password"
 
 # Recovery message
-message = st.text_area("Enter Recovery Message", 
-                       "Hello, here is your Smart Dairy password reset link or temporary password.")
+message = st.text_area(
+    "Recovery Message", 
+    "Hello, here is your Smart Dairy password reset link or temporary password."
+)
 
-if st.button("Send Recovery Mail"):
+# ----------------- SEND MAIL -----------------
+if st.button("📧 Send Recovery Mail"):
     try:
         # Create plain text email
         msg = MIMEText(message, "plain")
