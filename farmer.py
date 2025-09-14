@@ -13,9 +13,9 @@ st.info("Use your Brevo SMTP login and key to send recovery emails.")
 SMTP_SERVER = "smtp-relay.brevo.com"
 SMTP_PORT = 587
 
-# Credentials (from Brevo dashboard)
-login_email = st.text_input("Brevo SMTP Login (e.g., 96fca9001@smtp-brevo.com)")
-password = st.text_input("SMTP Key (Master Password)", type="password")
+# Credentials (from Brevo SMTP settings)
+login_email = "96fca9001@smtp-brevo.com"   # This is the SMTP Login from Brevo
+password = "CHLfKzFp1xSUQym5..."           # This is the SMTP Key (Master Password)
 
 # Fixed sender & receiver
 from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
